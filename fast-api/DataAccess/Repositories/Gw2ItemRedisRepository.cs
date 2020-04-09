@@ -1,8 +1,8 @@
 ﻿using fast_api.Contracts.Interfaces;
 using fast_api.Contracts.Models;
-using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace fast_api.DataAccess.Repositories
@@ -25,7 +25,7 @@ namespace fast_api.DataAccess.Repositories
         public async Task WriteToCache(Item item)
         {
             var db = _connectionMultiplexer.GetDatabase();
-            var json = JsonConvert.SerializeObject(item);
+            var json = JsonSerializer.Serialize(item, new JsonSerializerOptions() { MaxDepth = 3 });
             await db.StringSetAsync(item.Id.ToString(), json, new TimeSpan(0, 10, 0));
         }
 
@@ -33,7 +33,8 @@ namespace fast_api.DataAccess.Repositories
         {
             var db = _connectionMultiplexer.GetDatabase();
             var json = await db.StringGetAsync(id.ToString());
-            return JsonConvert.DeserializeObject<Item>(json);
+            var test = JsonSerializer.Deserialize<Item>(json);
+            return JsonSerializer.Deserialize<Item>(json);
         }
     }
 }

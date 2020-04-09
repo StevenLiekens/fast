@@ -6,6 +6,7 @@ namespace fast_api.Contracts.Interfaces
 {
     public interface ITpItemService
     {
+        Task<List<Item>> GetItemPricesFromApi();
         Task<List<Item>> GetItemPricesFromApi(int[] ids);
     }
 }

@@ -21,6 +21,12 @@ namespace fast_api.Presentation.Controllers
         //    return await _service.GetItemPricesFromApi();
         //}
 
+        [HttpGet]
+        public async Task<List<Item>> Get()
+        {
+            return await _service.GetItemPricesFromApi();
+        }
+
         [HttpPost]
         public async Task<List<Item>> Get(int[] ids)
         {

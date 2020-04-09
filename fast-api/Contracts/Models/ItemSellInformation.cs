@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace fast_api.Contracts.Models
 {
     public class ItemSellInformation
     {
-        [JsonProperty("quantity")]
+        [JsonPropertyName("quantity")]
         public int Quantity { get; set; }
-        [JsonProperty("unit_price")]
+        [JsonPropertyName("unit_price")]
         public int UnitPrice { get; set; }
     }
 }

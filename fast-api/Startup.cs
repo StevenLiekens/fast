@@ -1,8 +1,8 @@
 using fast_api.Config;
 using fast_api.Contracts.Interfaces;
 using fast_api.DataAccess.Repositories;
+using fast_api.Http;
 using fast_api.Services;
-using fast_api.Services.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -32,8 +32,11 @@ namespace fast_api
             services.Configure<Gw2ApiEndpoints>(apiSettingsSection);
             services.Configure<RedisConfig>(redisSettingsSection);
 
+            services.AddHttpClient<Gw2ApiClient>(x => { x.BaseAddress = new System.Uri(apiSettingsSection.Get<Gw2ApiEndpoints>().Gw2ApiRoot); });
+            services.AddSingleton<Gw2ApiClientFactory>();
+
             services.AddTransient<ITpItemService, TpItemService>();
-            services.AddTransient<IApiFetchClient, ApiFetchClient>();
+            services.AddTransient<IGw2ApiRepository, Gw2ApiRepository>();
             services.AddSingleton<ICacheRepository, Gw2ItemRedisRepository>();
             services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(redisSettingsSection.Get<RedisConfig>().RedisServerIp));
 
@@ -60,32 +63,32 @@ namespace fast_api
                 x.RoutePrefix = string.Empty;
             });
 
-            app.UseExceptionHandler(errorApp =>
-            {
-                errorApp.Run(async context =>
-                {
-                    context.Response.StatusCode = 500;
-                    context.Response.ContentType = "application/json";
+            //app.UseExceptionHandler(errorApp =>
+            //{
+            //    errorApp.Run(async context =>
+            //    {
+            //        context.Response.StatusCode = 500;
+            //        context.Response.ContentType = "application/json";
 
 
-                    var exceptionHandlerPathFeature =
-                        context.Features.Get<IExceptionHandlerPathFeature>();
+            //        var exceptionHandlerPathFeature =
+            //            context.Features.Get<IExceptionHandlerPathFeature>();
 
-                    // Use exceptionHandlerPathFeature to process the exception (for example, 
-                    // logging), but do NOT expose sensitive error information directly to 
-                    // the client.
-                    var errorType = exceptionHandlerPathFeature?.Error;
-                    switch (errorType)
-                    {
-                        case RedisConnectionException err:
-                            await context.Response.WriteAsync(JsonConvert.SerializeObject(new JsonResult(new { Error = "Redis error!" }).Value));
-                            break;
-                        default:
-                            await context.Response.WriteAsync(JsonConvert.SerializeObject(new JsonResult(new { Error = "Redis error!" }).Value));
-                            break;
-                    };
-                });
-            });
+            //        // Use exceptionHandlerPathFeature to process the exception (for example, 
+            //        // logging), but do NOT expose sensitive error information directly to 
+            //        // the client.
+            //        var errorType = exceptionHandlerPathFeature?.Error;
+            //        switch (errorType)
+            //        {
+            //            case RedisConnectionException err:
+            //                await context.Response.WriteAsync(JsonConvert.SerializeObject(new JsonResult(new { Error = "Redis error!" }).Value));
+            //                break;
+            //            default:
+            //                await context.Response.WriteAsync(JsonConvert.SerializeObject(new JsonResult(new { Error = "Redis error!" }).Value));
+            //                break;
+            //        };
+            //    });
+            //});
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
