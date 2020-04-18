@@ -1,8 +1,11 @@
 ﻿using fast_api.Contracts.Interfaces;
 using fast_api.Contracts.Models;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
+using fast_api.Contracts.DTO;
+using Microsoft.AspNetCore.Mvc;
 
 namespace fast_api.Presentation.Controllers
 {
@@ -11,27 +14,29 @@ namespace fast_api.Presentation.Controllers
     public class TpItemsController : ControllerBase
     {
         private readonly ITpItemService _service;
-        public TpItemsController(ITpItemService service)
+        private readonly IMapper _mapper;
+        public TpItemsController(ITpItemService service, IMapper mapper)
         {
+            _mapper = mapper;
             _service = service;
         }
 
-        //public async Task<List<ItemPrice>> Get()
-        //{
-        //    return await _service.GetItemPricesFromApi();
-        //}
-
+        [EnableCors("AllowOrigin")]
         [HttpGet]
-        public async Task<List<Item>> Get()
+        [ProducesResponseType(typeof(ItemDTO), 200)]
+        public async Task<ActionResult> Get()
         {
-            return await _service.GetItemPricesFromApi();
+            var items = await _service.GetItemPricesFromApi();
+            return Ok(_mapper.Map<List<Item>, IList<ItemDTO>>(items));
         }
 
+        [EnableCors("AllowOrigin")]
         [HttpPost]
-        public async Task<List<Item>> Get(int[] ids)
+        [ProducesResponseType(typeof(ItemDTO), 200)]
+        public async Task<ActionResult> Get(int[] ids)
         {
-            //var idArray = ids.Split(',');
-            return await _service.GetItemPricesFromApi(ids);
+            var items = await _service.GetItemPricesFromApi(ids);
+            return Ok(_mapper.Map<List<Item>, IList<ItemDTO>>(items));
         }
     }
 }

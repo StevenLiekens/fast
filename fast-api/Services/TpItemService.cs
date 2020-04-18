@@ -42,7 +42,8 @@ namespace fast_api.Services
                 var itemPrice = itemPrices.FirstOrDefault(x => x.ItemPriceId == item.Id);
                 if (itemPrice != null)
                 {
-                    item.PriceData = itemPrice.TpData;
+                    item.BuyData = itemPrice.BuyData;
+                    item.SellData = itemPrice.SellData;
                 }
             }
 

@@ -46,7 +46,7 @@ namespace fast_api.DataAccess.Repositories
                 itemTasks.Add(apiClient.FetchAllItemsFromApi(cancellationToken, gw2ApiEndpoints.Gw2ApiItemEndpoint + queryString));
                 //priceTasks.Add(apiClient.FetchAllItemPricesFromApi(cancellationToken, gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint + queryString));
             }
-            
+
             var resolvedItems = (await Task.WhenAll(itemTasks)).SelectMany(x => x).ToList();
             //var resolvedPrices = (await Task.WhenAll(priceTasks)).SelectMany(x => x).ToList();
             //resolvedItems.ForEach(x => x.PriceData = resolvedPrices.FirstOrDefault(y => y.ItemPriceId == x.Id).TpData);
@@ -65,7 +65,7 @@ namespace fast_api.DataAccess.Repositories
             {
                 tasks.Add(apiClient.FetchAllItemPricesFromApi(cancellationToken, gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint + "?ids=" + string.Join(",", index.Select(x => x))));
             }
-            
+
             return (await Task.WhenAll(tasks)).SelectMany(x => x).ToList();
         }
 
@@ -89,7 +89,7 @@ namespace fast_api.DataAccess.Repositories
             //        return itemsWithNames;
             //    }
             //}
-            if(itemIds == null || itemIds.Length == 0)
+            if (itemIds == null || itemIds.Length == 0)
             {
                 return new List<Item>();
             }
@@ -100,7 +100,11 @@ namespace fast_api.DataAccess.Repositories
             var items = await apiClient.FetchAllItemsFromApi(cancellationToken, query);
             var itemPrices = await apiClient.FetchAllItemPricesFromApi(cancellationToken, priceQuery);
 
-            items.ForEach(x => x.PriceData = itemPrices.FirstOrDefault(y => y.ItemPriceId == x.Id).TpData);
+            items.ForEach(x =>
+                {
+                    x.BuyData = itemPrices.FirstOrDefault(y => y.ItemPriceId == x.Id).BuyData;
+                    x.SellData = itemPrices.FirstOrDefault(y => y.ItemPriceId == x.Id).SellData;
+                });
 
             return items;
         }

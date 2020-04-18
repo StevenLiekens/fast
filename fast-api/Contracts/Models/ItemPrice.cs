@@ -7,7 +7,9 @@ namespace fast_api.Contracts.Models
     {
         [JsonPropertyName("id")]
         public int ItemPriceId { get; set; }
+        [JsonPropertyName("buys")]
+        public BuyData BuyData { get; set; }
         [JsonPropertyName("sells")]
-        public ItemSellInformation TpData { get; set; }
+        public SellData SellData { get; set; }
     }
 }

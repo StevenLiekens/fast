@@ -1,4 +1,6 @@
+using AutoMapper;
 using fast_api.Config;
+using fast_api.Config.AutoMapper;
 using fast_api.Contracts.Interfaces;
 using fast_api.DataAccess.Repositories;
 using fast_api.Http;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using System;
 
 namespace fast_api
 {
@@ -27,6 +30,13 @@ namespace fast_api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin", builder =>
+                {
+                    builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowAnyHeader();
+                });
+            });
             var apiSettingsSection = _configuration.GetSection("Gw2ApiEndpoints");
             var redisSettingsSection = _configuration.GetSection("Redis");
             services.Configure<Gw2ApiEndpoints>(apiSettingsSection);
@@ -40,12 +50,14 @@ namespace fast_api
             services.AddSingleton<ICacheRepository, Gw2ItemRedisRepository>();
             services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(redisSettingsSection.Get<RedisConfig>().RedisServerIp));
 
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers();
 
             services.AddSwaggerGen(x =>
             {
                 x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "FAST Gw2 API", Version = "v1" });
             });
+
+            services.AddAutoMapper(typeof(ItemMapperProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +69,8 @@ namespace fast_api
             }
 
             app.UseSwagger();
+
+
             app.UseSwaggerUI(x =>
             {
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "FAST Gw2 API v1");
@@ -89,7 +103,10 @@ namespace fast_api
             //        };
             //    });
             //});
+
             app.UseRouting();
+
+            app.UseCors("AllowOrigin");
 
             app.UseEndpoints(endpoints =>
             {
