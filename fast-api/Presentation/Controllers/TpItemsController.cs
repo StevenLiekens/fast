@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using fast_api.Contracts.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace fast_api.Presentation.Controllers
 {
@@ -15,10 +16,12 @@ namespace fast_api.Presentation.Controllers
     {
         private readonly ITpItemService _service;
         private readonly IMapper _mapper;
-        public TpItemsController(ITpItemService service, IMapper mapper)
+        private readonly ILogger _logger;
+        public TpItemsController(ITpItemService service, IMapper mapper, ILoggerFactory logger)
         {
             _mapper = mapper;
             _service = service;
+            _logger = logger.CreateLogger(typeof(TpItemsController));
         }
 
         [EnableCors("AllowOrigin")]
@@ -27,6 +30,7 @@ namespace fast_api.Presentation.Controllers
         public async Task<ActionResult> Get()
         {
             var items = await _service.GetItemPricesFromApi();
+            //_logger.LogError("dis error");
             return Ok(_mapper.Map<List<Item>, IList<ItemDTO>>(items));
         }
 
@@ -36,6 +40,7 @@ namespace fast_api.Presentation.Controllers
         public async Task<ActionResult> Get(int[] ids)
         {
             var items = await _service.GetItemPricesFromApi(ids);
+            //_logger.LogError("dis error");
             return Ok(_mapper.Map<List<Item>, IList<ItemDTO>>(items));
         }
     }

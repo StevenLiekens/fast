@@ -12,10 +12,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Serilog;
+using Serilog.Data;
 using StackExchange.Redis;
 using System;
+using System.Data;
+using System.Diagnostics;
 
 namespace fast_api
 {
@@ -30,25 +36,51 @@ namespace fast_api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var apiSettingsSection = _configuration.GetSection("Gw2ApiEndpoints");
+            var redisSettingsSection = _configuration.GetSection("Redis");
+            var loggingSettingsSection = _configuration.GetSection("Logging");
+            var allowedCorsDomainsSection = _configuration.GetSection("CORSDomains");
+            services.Configure<Gw2ApiEndpoints>(apiSettingsSection);
+            services.Configure<RedisConfig>(redisSettingsSection);
+            services.Configure<CORSDomains>(allowedCorsDomainsSection);
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                options.HttpsPort = 433;
+            });
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowOrigin", builder =>
                 {
-                    builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowAnyHeader();
+                    //builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowAnyHeader().AllowAnyMethod();
+                    //builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "0.0.0.0").AllowAnyHeader().AllowAnyMethod();
+                    //builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "rofl.test").AllowAnyHeader().AllowAnyMethod();
+                    //builder.WithOrigins("https://fast.farming-community.eu", "http://localhost:8080", "http://rofl.test:8080").AllowAnyHeader().AllowAnyMethod();
+                    //builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    builder.WithOrigins(allowedCorsDomainsSection.Get<CORSDomains>().AllowedCorsDomains.Split(';')).AllowAnyMethod().AllowAnyHeader();
                 });
             });
-            var apiSettingsSection = _configuration.GetSection("Gw2ApiEndpoints");
-            var redisSettingsSection = _configuration.GetSection("Redis");
-            services.Configure<Gw2ApiEndpoints>(apiSettingsSection);
-            services.Configure<RedisConfig>(redisSettingsSection);
 
-            services.AddHttpClient<Gw2ApiClient>(x => { x.BaseAddress = new System.Uri(apiSettingsSection.Get<Gw2ApiEndpoints>().Gw2ApiRoot); });
+            services.AddHttpClient<Gw2ApiClient>(x => { x.BaseAddress = new Uri(apiSettingsSection.Get<Gw2ApiEndpoints>().Gw2ApiRoot); });
             services.AddSingleton<Gw2ApiClientFactory>();
 
             services.AddTransient<ITpItemService, TpItemService>();
             services.AddTransient<IGw2ApiRepository, Gw2ApiRepository>();
             services.AddSingleton<ICacheRepository, Gw2ItemRedisRepository>();
-            services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(redisSettingsSection.Get<RedisConfig>().RedisServerIp));
+            services.AddSingleton<IConnectionMultiplexer>(x =>
+            {
+                try
+                {
+                    return ConnectionMultiplexer.Connect(redisSettingsSection.Get<RedisConfig>().RedisServerIp);
+                }
+                catch (RedisConnectionException ex)
+                {
+                    Log.Error("Redis error. Is the redis instance running and properly configured?");
+                    return null;
+                }
+            });
 
             services.AddControllers();
 
@@ -68,8 +100,11 @@ namespace fast_api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwagger();
+            app.UseAuthentication();
 
+            app.UseHttpsRedirection();
+
+            app.UseSwagger();
 
             app.UseSwaggerUI(x =>
             {

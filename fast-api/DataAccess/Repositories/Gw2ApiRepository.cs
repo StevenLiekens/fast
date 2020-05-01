@@ -39,7 +39,7 @@ namespace fast_api.DataAccess.Repositories
             IEnumerable<IEnumerable<int>> chunkedItemIds;
             List<Item> items = new List<Item>();
             var ids = await apiClient.FetchAllItemIdsFromApi(cancellationToken, gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint);
-            chunkedItemIds = ids.Where(x => !filter.Contains(x)).Chunks(200);
+            chunkedItemIds = ids.Where(x => !filter.Contains(x)).Chunks(150);
             foreach (var index in chunkedItemIds)
             {
                 var queryString = "?ids=" + string.Join(",", index.Select(x => x));
@@ -60,7 +60,7 @@ namespace fast_api.DataAccess.Repositories
             IEnumerable<IEnumerable<int>> chunkedItemIds;
             List<ItemPrice> items = new List<ItemPrice>();
             var ids = await apiClient.FetchAllItemIdsFromApi(cancellationToken, gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint);
-            chunkedItemIds = ids.Where(x => !filter.Contains(x)).Chunks(200);
+            chunkedItemIds = ids.Where(x => !filter.Contains(x)).Chunks(150);
             foreach (var index in chunkedItemIds)
             {
                 tasks.Add(apiClient.FetchAllItemPricesFromApi(cancellationToken, gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint + "?ids=" + string.Join(",", index.Select(x => x))));

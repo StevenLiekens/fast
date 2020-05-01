@@ -73,7 +73,7 @@ namespace fast_api.Services
                 //}
             }
             retVal.AddRange(await _apiRepository.FetchItemPricesFromApi(CancellationToken.None, idList.ToArray()));
-            var remainingItems = retVal.Where(x => idList.Contains(x.Id)).ToList();
+            var remainingItems = retVal.Where(x => idList.Contains(x.Id))?.ToList();
             remainingItems.ForEach(async item => await _cacheRepository.WriteToCache(item));
 
             return retVal;
