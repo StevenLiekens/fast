@@ -14,6 +14,9 @@ using Serilog;
 using StackExchange.Redis;
 using System;
 using System.Reflection;
+using fast_api.EntityFramework;
+using fast_api.Services.interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace fast_api
 {
@@ -28,6 +31,8 @@ namespace fast_api
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<FastContext>(options => options.UseMySql(_configuration.GetConnectionString("MariaDB")));
+            
             var apiSettingsSection = _configuration.GetSection("Gw2ApiEndpoints");
             var redisSettingsSection = _configuration.GetSection("Redis");
             var allowedCorsDomainsSection = _configuration.GetSection("CORSDomains");
@@ -51,6 +56,8 @@ namespace fast_api
 
             services.AddHttpClient<Gw2ApiClient>(x => { x.BaseAddress = new Uri(apiSettingsSection.Get<Gw2ApiEndpoints>().Gw2ApiRoot); });
 
+            services.AddScoped<IItemsService, ItemsService>();
+            services.AddScoped<ISelectionContainerService, SelectionContainerService>();
             services.AddTransient<ITpItemService, TpItemService>();
             services.AddTransient<IGw2ApiRepository, Gw2ApiRepository>();
             services.AddSingleton<ICacheRepository, Gw2ItemRedisRepository>();
@@ -84,7 +91,7 @@ namespace fast_api
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseAuthentication();
 
             app.UseHttpsRedirection();

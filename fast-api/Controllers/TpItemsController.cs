@@ -1,15 +1,15 @@
 ﻿using System;
-using fast_api.Contracts.Interfaces;
-using fast_api.Contracts.Models;
-using Microsoft.AspNetCore.Cors;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using fast_api.Contracts.DTO;
+using fast_api.Contracts.Interfaces;
+using fast_api.Contracts.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace fast_api.Presentation.Controllers
+namespace fast_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
