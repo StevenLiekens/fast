@@ -1,6 +1,5 @@
 ﻿using fast_api.Contracts.Interfaces;
 using fast_api.Contracts.Models;
-using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -21,10 +20,10 @@ namespace fast_api.Services
         public async Task<List<Item>> GetItemPricesFromApi()
         {
             var ids = await _apiRepository.FetchAllItemIdsFromApi(CancellationToken.None);
-            List<int> filter = new List<int>();
-            List<Item> items = new List<Item>();
-            List<Item> cachedItems = new List<Item>();
-            List<ItemPrice> itemPrices = new List<ItemPrice>();
+            var filter = new List<int>();
+            var items = new List<Item>();
+            var cachedItems = new List<Item>();
+            var itemPrices = new List<ItemPrice>();
             foreach (var id in ids.ToArray())
             {
                 if (await _cacheRepository.CheckIfCached(id))

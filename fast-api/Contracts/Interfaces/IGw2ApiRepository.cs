@@ -8,9 +8,8 @@ namespace fast_api.Contracts.Interfaces
     public interface IGw2ApiRepository
     {
         Task<List<int>> FetchAllItemIdsFromApi(CancellationToken cancellationToken);
-        Task<List<Item>> FetchAllItemsFromApi(CancellationToken cancellationToken, int[] filter = null);
-        Task<List<ItemPrice>> FetchAllItemPricesFromApi(CancellationToken cancellationToken, int[] filter = null);
+        Task<List<Item>> FetchAllItemsFromApi(CancellationToken cancellationToken, int[] filter);
+        Task<List<ItemPrice>> FetchAllItemPricesFromApi(CancellationToken cancellationToken, int[] filter);
         Task<List<Item>> FetchItemPricesFromApi(CancellationToken cancellationToken, int[] itemIds);
-        //Task<Item> FetchItemPriceFromApi(int id);
     }
 }

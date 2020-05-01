@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using fast_api.Config;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace fast_api
@@ -33,7 +27,7 @@ namespace fast_api
                     .WriteTo.Console()
                     .WriteTo.Logger(x =>
                     {
-                        if (config.GetSection("Logging").GetValue<bool>("LogToFile") == true)
+                        if (config.GetSection("Logging").GetValue<bool>("LogToFile"))
                         {
                             x.WriteTo.File("information.log", rollOnFileSizeLimit: true, fileSizeLimitBytes: 20_971_520);
                             x.Filter.ByExcluding(x => x.Level == Serilog.Events.LogEventLevel.Error);
