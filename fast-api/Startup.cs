@@ -40,12 +40,6 @@ namespace fast_api
             services.Configure<RedisConfig>(redisSettingsSection);
             services.Configure<CORSDomains>(allowedCorsDomainsSection);
 
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 433;
-            });
-
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowOrigin", builder =>
@@ -91,10 +85,6 @@ namespace fast_api
             {
                 app.UseDeveloperExceptionPage();
             }
-            
-            app.UseAuthentication();
-
-            app.UseHttpsRedirection();
 
             app.UseSwagger();
 
