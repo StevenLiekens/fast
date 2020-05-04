@@ -7,6 +7,8 @@ namespace fast_api.Services.interfaces
     public interface ISelectionContainerService
     {
         Task<List<SelectionContainerDTO>> GetAsync();
-        Task AddAsync(SelectionContainerDTO selectionContainer);
+        Task DeleteAsync(int id);
+        Task AddOrUpdateAsync(SelectionContainerDTO selectionContainerDto);
+        Task UpdatePrices();
     }
 }

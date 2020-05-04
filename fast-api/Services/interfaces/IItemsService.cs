@@ -8,5 +8,6 @@ namespace fast_api.Services.interfaces
     {
         Task<List<ItemDTO>> GetAsync();
         Task FetchItemsFromApiAsync();
+        Task UpdatePrices();
     }
 }

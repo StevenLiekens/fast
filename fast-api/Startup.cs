@@ -17,6 +17,9 @@ using System.Reflection;
 using fast_api.EntityFramework;
 using fast_api.Services.interfaces;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace fast_api
 {
@@ -52,6 +55,7 @@ namespace fast_api
 
             services.AddScoped<IItemsService, ItemsService>();
             services.AddScoped<ISelectionContainerService, SelectionContainerService>();
+            services.AddScoped<ICurrencyService, CurrencyService>();
             services.AddTransient<ITpItemService, TpItemService>();
             services.AddTransient<IGw2ApiRepository, Gw2ApiRepository>();
             services.AddSingleton<ICacheRepository, Gw2ItemRedisRepository>();

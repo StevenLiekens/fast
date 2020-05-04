@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using fast_api.Contracts.DTO;
-using fast_api.Contracts.Interfaces;
-using fast_api.Services;
 using fast_api.Services.interfaces;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 
 namespace fast_api.Controllers
@@ -52,6 +45,22 @@ namespace fast_api.Controllers
             try
             {
                 await _itemsService.FetchItemsFromApiAsync();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, "Error :(");
+                return Problem($"An error occured: {e}");
+            }
+        }
+
+        [HttpGet]
+        [Route("UpdatePrices")]
+        public async Task<ActionResult> UpdatePrices()
+        {
+            try
+            {
+                await _itemsService.UpdatePrices();
                 return Ok();
             }
             catch (Exception e)

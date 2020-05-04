@@ -13,42 +13,34 @@ namespace fast_api.DataAccess.Repositories
 {
     public class Gw2ApiRepository : IGw2ApiRepository
     {
-        private readonly Gw2ApiEndpoints _gw2ApiEndpoints;
         private readonly Gw2ApiClient _gw2ApiClient;
 
-        public Gw2ApiRepository(IOptions<Gw2ApiEndpoints> options, Gw2ApiClient gw2ApiClient)
+        public Gw2ApiRepository(Gw2ApiClient gw2ApiClient)
         {
             _gw2ApiClient = gw2ApiClient;
-            _gw2ApiEndpoints = options.Value;
         }
 
         public async Task<List<int>> FetchAllItemIdsFromApi(CancellationToken cancellationToken)
         {
-            return await _gw2ApiClient.FetchAllItemIdsFromApi(cancellationToken,
-                _gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint);
+            return await _gw2ApiClient.FetchAllItemIdsAsync(cancellationToken);
         }
 
         public async Task<List<Item>> FetchAllItemsFromApi(CancellationToken cancellationToken, int[] filter)
         {
-            var ids = await _gw2ApiClient.FetchAllItemIdsFromApi(cancellationToken,
-                _gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint);
+            var ids = await _gw2ApiClient.FetchAllItemIdsAsync(cancellationToken);
             var chunkedItemIds = ids.Where(x => !filter.Contains(x)).Batch(150);
-            var itemTasks = chunkedItemIds.Select(index => "?ids=" + string.Join(",", index.Select(x => x)))
-                .Select(queryString =>
-                    _gw2ApiClient.FetchAllItemsFromApi(cancellationToken,
-                        _gw2ApiEndpoints.Gw2ApiItemEndpoint + queryString)).ToList();
-
+            var itemTasks = chunkedItemIds.Select(chunk => _gw2ApiClient.FetchItemsForIdsAsync(cancellationToken, chunk))
+                .ToList();
             var resolvedItems = (await Task.WhenAll(itemTasks)).SelectMany(x => x).ToList();
             return resolvedItems;
         }
 
         public async Task<List<ItemPrice>> FetchAllItemPricesFromApi(CancellationToken cancellationToken, int[] filter)
         {
-            var ids = await _gw2ApiClient.FetchAllItemIdsFromApi(cancellationToken,
-                _gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint);
+            var ids = await _gw2ApiClient.FetchAllItemIdsAsync(cancellationToken);
             var chunkedItemIds = ids.Where(x => !filter.Contains(x)).Batch(150);
-            var tasks = chunkedItemIds.Select(index => _gw2ApiClient.FetchAllItemPricesFromApi(cancellationToken,
-                    _gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint + "?ids=" + string.Join(",", index.Select(x => x))))
+            var tasks = chunkedItemIds
+                .Select(chunk => _gw2ApiClient.FetchItemPricesForIdsAsync(cancellationToken, chunk))
                 .ToList();
 
             return (await Task.WhenAll(tasks)).SelectMany(x => x).ToList();
@@ -61,11 +53,8 @@ namespace fast_api.DataAccess.Repositories
                 return new List<Item>();
             }
 
-            var queryString = "?ids=" + string.Join(",", string.Join(",", itemIds));
-            var query = _gw2ApiEndpoints.Gw2ApiItemEndpoint + queryString;
-            var priceQuery = _gw2ApiEndpoints.Gw2ApiCommercePricesEndpoint + queryString;
-            var items = await _gw2ApiClient.FetchAllItemsFromApi(cancellationToken, query);
-            var itemPrices = await _gw2ApiClient.FetchAllItemPricesFromApi(cancellationToken, priceQuery);
+            var items = await _gw2ApiClient.FetchItemsForIdsAsync(cancellationToken, itemIds);
+            var itemPrices = await _gw2ApiClient.FetchItemPricesForIdsAsync(cancellationToken, itemIds);
 
             items.ForEach(x =>
             {

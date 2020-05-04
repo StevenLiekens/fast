@@ -7,8 +7,8 @@ namespace fast_api.Contracts.Interfaces
 {
     public interface IGw2ApiClient
     {
-        Task<List<int>> FetchAllItemIdsFromApi(CancellationToken cancellationToken, string endpoint);
-        Task<List<Item>> FetchAllItemsFromApi(CancellationToken cancellationToken, string endpoint);
-        Task<List<ItemPrice>> FetchAllItemPricesFromApi(CancellationToken cancellationToken, string endpoint);
+        Task<List<int>> FetchAllItemIdsAsync(CancellationToken cancellationToken);
+        Task<List<Item>> FetchItemsForIdsAsync(CancellationToken cancellationToken, IEnumerable<int> ids);
+        Task<List<ItemPrice>> FetchItemPricesForIdsAsync(CancellationToken cancellationToken, IEnumerable<int> ids);
     }
 }

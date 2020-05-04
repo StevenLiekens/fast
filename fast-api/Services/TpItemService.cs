@@ -56,7 +56,6 @@ namespace fast_api.Services
         {
             var retVal = new List<Item>();
             var idList = ids.ToList();
-            var cachedItems = new List<Item>();
             foreach (var id in ids.ToList())
             {
                 if (await _cacheRepository.CheckIfCached(id))
@@ -64,12 +63,6 @@ namespace fast_api.Services
                     retVal.Add(await _cacheRepository.ReadFromCache(id));
                     idList.Remove(id);
                 }
-                //else
-                //{
-                //    var item = await _apiRepository.FetchItemPriceFromApi(id);
-                //    await _cacheRepository.WriteToCache(item);
-                //    retVal.Add(item);
-                //}
             }
             retVal.AddRange(await _apiRepository.FetchItemPricesFromApi(CancellationToken.None, idList.ToArray()));
             var remainingItems = retVal.Where(x => idList.Contains(x.Id))?.ToList();

@@ -13,13 +13,11 @@ namespace fast_api.Controllers
     public class SelectionContainerController : ControllerBase
     {
         private readonly ISelectionContainerService _selectionContainerService;
-        private readonly IMapper _mapper;
         private readonly ILogger<SelectionContainerController> _logger;
 
-        public SelectionContainerController(ISelectionContainerService selectionContainerService, IMapper mapper, ILogger<SelectionContainerController> logger)
+        public SelectionContainerController(ISelectionContainerService selectionContainerService, ILogger<SelectionContainerController> logger)
         {
             _selectionContainerService = selectionContainerService;
-            _mapper = mapper;
             _logger = logger;
         }
 
@@ -43,7 +41,23 @@ namespace fast_api.Controllers
         {
             try
             {
-                await _selectionContainerService.AddAsync(selectionContainer);
+                await _selectionContainerService.AddOrUpdateAsync(selectionContainer);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, "Error :(");
+                return Problem($"An error occured: {e}");
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                await _selectionContainerService.DeleteAsync(id);
                 return Ok();
             }
             catch (Exception e)
