@@ -10,11 +10,10 @@ namespace fast_api.Contracts.DTO
         public string Name { get; set; }
         public string Info { get; set; }
 
-        public CurrencyTradeCost[] CurrencyTradeCost { get; set; }
+        public CurrencyTradeCostDTO[] CurrencyTradeCost { get; set; }
         public int CoinCost { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ItemType Type { get; set; }
+        public string Type { get; set; }
 
         public int ItemId { get; set; }
         public int ItemAmount { get; set; }

@@ -59,7 +59,7 @@ namespace fast_api.Migrations
 
                     b.HasIndex("SelectionContainerId");
 
-                    b.ToTable("CurrencyTrade");
+                    b.ToTable("CurrencyTrades");
                 });
 
             modelBuilder.Entity("fast_api.EntityFramework.CurrencyTradeCost", b =>
@@ -81,7 +81,7 @@ namespace fast_api.Migrations
 
                     b.HasIndex("CurrencyTradeId");
 
-                    b.ToTable("CurrencyTradeCost");
+                    b.ToTable("CurrencyTradeCosts");
                 });
 
             modelBuilder.Entity("fast_api.EntityFramework.Item", b =>
@@ -132,7 +132,7 @@ namespace fast_api.Migrations
                     b.Property<int>("SelectionContainerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ItemId")
+                    b.Property<int?>("ItemId")
                         .HasColumnType("int");
 
                     b.Property<int>("Amount")

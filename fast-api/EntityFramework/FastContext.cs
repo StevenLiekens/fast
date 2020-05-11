@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using Z.EntityFramework.Extensions;
-
 namespace fast_api.EntityFramework
 {
     public class FastContext : DbContext
@@ -9,6 +8,10 @@ namespace fast_api.EntityFramework
         public DbSet<Item> Items { get; set; }
         public DbSet<SelectionContainer> SelectionContainers { get; set; }
         public DbSet<SelectionContainerItem> SelectionContainerItems { get; set; }
+        public DbSet<CurrencyTrade> CurrencyTrades { get; set; }
+        public DbSet<CurrencyTradeCost> CurrencyTradeCosts { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<CategoryItem> CategoryItems { get; set; }
 
         public FastContext(DbContextOptions<FastContext> dbContext) : base(dbContext)
         {
@@ -26,24 +29,16 @@ namespace fast_api.EntityFramework
                 .HasMany(sc => sc.SelectionContainerItems)
                 .WithOne(sci => sci.SelectionContainer)
                 .HasForeignKey(sci => sci.SelectionContainerId);
-            modelBuilder.Entity<SelectionContainerItem>()
-                .HasOne(sci => sci.Item)
-                .WithMany()
-                .HasForeignKey(x => x.ItemId);
             modelBuilder.Entity<CurrencyTrade>()
                 .HasMany(ct => ct.CurrencyTradeCost)
                 .WithOne(ctc => ctc.CurrencyTrade)
                 .HasForeignKey(ct => ct.CurrencyTradeId);
-            modelBuilder.Entity<CurrencyTrade>()
-                .HasOne<SelectionContainer>()
-                .WithMany()
-                .HasForeignKey(ct => ct.SelectionContainerId)
-                .IsRequired(false);
-            modelBuilder.Entity<CurrencyTrade>()
-                .HasOne<Item>()
-                .WithMany()
-                .HasForeignKey(ct => ct.ItemId)
-                .IsRequired(false);
+            modelBuilder.Entity<CategoryItem>()
+                .HasKey(sci => new { sci.CategoryId, sci.ItemId });
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.CategoryItems)
+                .WithOne(ci => ci.Category)
+                .HasForeignKey(c => c.CategoryId);
         }
     }
 
@@ -53,7 +48,9 @@ namespace fast_api.EntityFramework
         SelectionContainer,
         Container,
         Category,
-        Currency
+        Currency,
+        //TODO: crafting??
+        //TODO: Mystic Forge??
     }
 
     public class Item
@@ -82,9 +79,10 @@ namespace fast_api.EntityFramework
         public SelectionContainer SelectionContainer { get; set; }
 
         public ItemType ItemType { get; set; }
-
-        public int ItemId { get; set; }
+        
+        [ForeignKey("ItemId")]
         public Item Item { get; set; }
+        public int? ItemId { get; set; }
 
         public string Currency { get; set; }
 
@@ -102,13 +100,15 @@ namespace fast_api.EntityFramework
         public int CoinCost { get; set; }
 
         public ItemType ItemType { get; set; }
-
+        
+        [ForeignKey("ItemId")]
         public Item Item { get; set; }
-        public int ItemId { get; set; }
+        public int? ItemId { get; set; }
         public int ItemAmount { get; set; }
-
-        public SelectionContainer SelectionContainer { get; set; }
-        public int SelectionContainerId { get; set; }
+        
+        [ForeignKey("SelectionContainerId")]
+        public virtual SelectionContainer SelectionContainer { get; set; }
+        public int? SelectionContainerId { get; set; }
         public int SelectionContainerAmount { get; set; }
 
         public int Buy { get; set; }
@@ -124,5 +124,24 @@ namespace fast_api.EntityFramework
 
         public CurrencyTrade CurrencyTrade { get; set; }
         public int CurrencyTradeId { get; set; }
+    }
+
+    public class Category
+    {
+        public int CategoryId { get; set; }
+        public string Name { get; set; }
+        public string Info { get; set; }
+
+        public ICollection<CategoryItem> CategoryItems { get; set; }
+    }
+
+    public class CategoryItem
+    {
+        public Category Category { get; set; }
+        public int CategoryId { get; set; }
+        
+        [ForeignKey("ItemId")]
+        public Item Item { get; set; }
+        public int? ItemId { get; set; }
     }
 }

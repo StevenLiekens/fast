@@ -38,12 +38,42 @@ namespace fast_api.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult> AddOrUpdateAsync()
+        [HttpGet]
+        [Route("{currency}")]
+        [ProducesResponseType(typeof(PriceDataDTO), 200)]
+        public async Task<ActionResult> GetAsync([FromRoute]string currency)
         {
             try
             {
-                if
+                return Ok(await _currencyService.GetCurrencyValueAsync(currency));
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, "Error :(");
+                return Problem($"An error occured: {e}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddOrUpdateAsync(CurrencyTradeDTO currencyTrade)
+        {
+            try
+            {
+                await _currencyService.AddOrUpdateAsync(currencyTrade);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, "Error :(");
+                return Problem($"An error occured: {e}");
+            }
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
                 return Ok();
             }
             catch (Exception e)

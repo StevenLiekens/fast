@@ -23,32 +23,22 @@ namespace fast_api.Services
 
         public async Task<List<SelectionContainerDTO>> GetAsync()
         {
-            var data = _context.SelectionContainers
-                .Include(selectionContainer => selectionContainer.SelectionContainerItems).Take(5).ToList();
-            return _mapper.Map<List<SelectionContainerDTO>>(await _context.SelectionContainers.Take(5).ToListAsync());
+            //TODO: Remove the random Take(5)
+            var data = await _context.SelectionContainers
+                .Include(selectionContainer => selectionContainer.SelectionContainerItems).Take(5).ToListAsync();
+            return _mapper.Map<List<SelectionContainerDTO>>(data);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var entry = await _context.SelectionContainers.FindAsync(id);
-            _context.Remove(entry);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdatePrices()
-        {
-            var selectionContainers = await _context.SelectionContainers.Include(selectionContainer => selectionContainer.SelectionContainerItems).ToListAsync();
-            selectionContainers.ForEach(CalculateSelectionContainerPrices);
-            await _context.SaveChangesAsync();
+            await DeleteByIdAsync(id);
         }
 
         public async Task AddOrUpdateAsync(SelectionContainerDTO selectionContainerDto)
         {
-            var selectionContainer = await _context.SelectionContainers.FindAsync(selectionContainerDto.Id);
-            _context.SelectionContainers.Remove(selectionContainer);
-            await _context.SaveChangesAsync();
+            await DeleteByIdAsync(selectionContainerDto.Id);
 
-            selectionContainer = new SelectionContainer
+            var selectionContainer = new SelectionContainer
             {
                 SelectionContainerId = selectionContainerDto.Id,
                 Name = selectionContainerDto.Name,
@@ -68,6 +58,23 @@ namespace fast_api.Services
             CalculateSelectionContainerPrices(selectionContainer);
             await _context.SelectionContainers.AddAsync(selectionContainer);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdatePrices()
+        {
+            var selectionContainers = await _context.SelectionContainers.Include(selectionContainer => selectionContainer.SelectionContainerItems).ToListAsync();
+            selectionContainers.ForEach(CalculateSelectionContainerPrices);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task DeleteByIdAsync(int id)
+        {
+            var entry = await _context.SelectionContainers.FindAsync(id);
+            if (entry != null)
+            {
+                _context.Remove(entry);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private static void CalculateSelectionContainerPrices(SelectionContainer selectionContainer)
