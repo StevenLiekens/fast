@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using fast_api.Contracts.DTO;
+using fast_api.EntityFramework.Entities;
 
 namespace fast_api.Services.interfaces
 {
     public interface ISelectionContainerService
     {
-        Task<List<SelectionContainerDTO>> GetAsync();
+        Task<List<SelectionContainer>> GetAsync();
         Task DeleteAsync(int id);
-        Task AddOrUpdateAsync(SelectionContainerDTO selectionContainerDto);
+        Task AddOrUpdateAsync(SelectionContainer selectionContainer);
         Task UpdatePricesAsync();
     }
 }

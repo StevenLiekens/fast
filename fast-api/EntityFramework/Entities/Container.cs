@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace fast_api.EntityFramework.Entities
@@ -11,7 +10,7 @@ namespace fast_api.EntityFramework.Entities
             modelBuilder.Entity<ContainerItem>()
                 .HasKey(sci => new { sci.ContainerId, sci.ItemId });
             modelBuilder.Entity<Container>()
-                .HasMany(sc => sc.ContainerItem)
+                .HasMany(sc => sc.ContainerItems)
                 .WithOne(sci => sci.Container)
                 .HasForeignKey(sci => sci.ContainerId);
             modelBuilder.Entity<ContainerContainer>()
@@ -48,7 +47,7 @@ namespace fast_api.EntityFramework.Entities
         public string Info { get; set; }
         public string Tag { get; set; }
 
-        public ICollection<ContainerItem> ContainerItem { get; set; }
+        public ICollection<ContainerItem> ContainerItems { get; set; }
         public ICollection<ContainerContainer> ContainerContainers { get; set; }
         public ICollection<ContainerSelectionContainer> ContainerSelectionContainers { get; set; }
         public ICollection<ContainerCategory> ContainerCategories { get; set; }

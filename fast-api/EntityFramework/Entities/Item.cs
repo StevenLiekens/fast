@@ -1,6 +1,6 @@
 ﻿namespace fast_api.EntityFramework.Entities
 {
-    public class Item
+    public class Item 
     {
         public int ItemId { get; set; }
         public string Name { get; set; }

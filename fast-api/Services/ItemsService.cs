@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using fast_api.Contracts.DTO;
 using fast_api.Contracts.Interfaces;
 using fast_api.EntityFramework;
 using fast_api.EntityFramework.Entities;
@@ -21,20 +20,27 @@ namespace fast_api.Services
         private readonly ITpItemService _tpItemService;
         private readonly Gw2ApiClient _gw2ApiClient;
         private readonly ISelectionContainerService _selectionContainerService;
+        private readonly ICategoryService _categoryService;
+        private readonly ICurrencyService _currencyService;
+        private readonly IContainerService _containerService;
 
         public ItemsService(FastContext context, IMapper mapper, ITpItemService tpItemService,
-            Gw2ApiClient gw2ApiClient, ISelectionContainerService selectionContainerService)
+            Gw2ApiClient gw2ApiClient, ISelectionContainerService selectionContainerService,
+            ICategoryService categoryService, ICurrencyService currencyService, IContainerService containerService)
         {
             _context = context;
             _mapper = mapper;
             _tpItemService = tpItemService;
             _gw2ApiClient = gw2ApiClient;
             _selectionContainerService = selectionContainerService;
+            _categoryService = categoryService;
+            _currencyService = currencyService;
+            _containerService = containerService;
         }
 
-        public async Task<List<ItemDTO>> GetAsync()
+        public async Task<List<Item>> GetAsync()
         {
-            return _mapper.Map<List<ItemDTO>>(await _context.Items.Take(50).ToListAsync());
+            return await _context.Items.Take(50).ToListAsync();
         }
 
         public async Task FetchItemsFromApiAsync()
@@ -59,8 +65,13 @@ namespace fast_api.Services
                 x.Sell = itemPriceDictionary[x.ItemId].SellData.SellPrice;
             });
 
+            //TODO: Unfuck this. needs more thinking. Build hierarchy? Iterate until all updated?
             await _context.SaveChangesAsync();
+            await _categoryService.UpdatePricesAsync();
+
+            await _currencyService.UpdatePricesAsync();
             await _selectionContainerService.UpdatePricesAsync();
+            await _containerService.UpdatePricesAsync();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace fast_api.EntityFramework.Entities
             modelBuilder.Entity<SelectionContainerItem>()
                 .HasKey(sci => new { sci.SelectionContainerId, sci.ItemId });
             modelBuilder.Entity<SelectionContainer>()
-                .HasMany(sc => sc.SelectionContainerItem)
+                .HasMany(sc => sc.SelectionContainerItems)
                 .WithOne(sci => sci.SelectionContainer)
                 .HasForeignKey(sci => sci.SelectionContainerId);
             modelBuilder.Entity<SelectionContainerContainer>()
@@ -36,13 +36,13 @@ namespace fast_api.EntityFramework.Entities
         }
     }
     
-    public class SelectionContainer
+    public class SelectionContainer 
     {
         public int SelectionContainerId { get; set; }
         public string Name { get; set; }
         public string Info { get; set; }
 
-        public ICollection<SelectionContainerItem> SelectionContainerItem { get; set; }
+        public ICollection<SelectionContainerItem> SelectionContainerItems { get; set; }
         public ICollection<SelectionContainerContainer> SelectionContainerContainers { get; set; }
         public ICollection<SelectionContainerCategory> SelectionContainerCategories { get; set; }
         public ICollection<SelectionContainerCurrency> SelectionContainerCurrencies { get; set; }
@@ -61,6 +61,9 @@ namespace fast_api.EntityFramework.Entities
 
         public bool Guaranteed { get; set; }
         public int Amount { get; set; }
+         
+        [NotMapped]
+        public int BuyPrice => Item.Buy * Amount;
     }
 
     public class SelectionContainerContainer
