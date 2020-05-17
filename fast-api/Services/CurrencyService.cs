@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using fast_api.Contracts.DTO;
 using fast_api.EntityFramework;
+using fast_api.EntityFramework.Entities;
 using fast_api.Services.interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +57,8 @@ namespace fast_api.Services
                 Name = currencyTradeDto.Name,
                 Info = currencyTradeDto.Info,
                 CoinCost = currencyTradeDto.CoinCost,
-                ItemType = Enum.Parse<ItemType>(currencyTradeDto.Type)
+                ItemType = Enum.Parse<ItemType>(currencyTradeDto.Type),
+                Amount = currencyTradeDto.Amount
             };
 
             currencyTrade.CurrencyTradeCost = currencyTradeDto.CurrencyTradeCost.Select(x => new CurrencyTradeCost
@@ -71,12 +73,10 @@ namespace fast_api.Services
             {
                 case ItemType.Item:
                     currencyTrade.ItemId = currencyTradeDto.ItemId;
-                    currencyTrade.ItemAmount = currencyTradeDto.ItemAmount;
                     currencyTrade.Item = await _context.Items.FindAsync(currencyTrade.ItemId);
                     break;
                 case ItemType.SelectionContainer:
                     currencyTrade.SelectionContainerId = currencyTradeDto.SelectionContainerId;
-                    currencyTrade.SelectionContainerAmount = currencyTradeDto.SelectionContainerAmount;
                     currencyTrade.SelectionContainer =
                         await _context.SelectionContainers.FindAsync(currencyTrade.SelectionContainerId);
                     break;
@@ -96,7 +96,7 @@ namespace fast_api.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdatePrices()
+        public async Task UpdatePricesAsync()
         {
             var currencyTrades = await _context.CurrencyTrades.Include(currencyTrade => currencyTrade.CurrencyTradeCost).ToListAsync();
             currencyTrades.ForEach(CalculateCurrencyTradePrices);
@@ -118,12 +118,12 @@ namespace fast_api.Services
             switch (currencyTrade.ItemType)
             {
                 case ItemType.Item:
-                    currencyTrade.Buy = currencyTrade.Item.Buy * currencyTrade.ItemAmount - currencyTrade.CoinCost;
-                    currencyTrade.Sell = currencyTrade.Item.Sell * currencyTrade.ItemAmount - currencyTrade.CoinCost;
+                    currencyTrade.Buy = currencyTrade.Item.Buy * currencyTrade.Amount - currencyTrade.CoinCost;
+                    currencyTrade.Sell = currencyTrade.Item.Sell * currencyTrade.Amount - currencyTrade.CoinCost;
                     break;
                 case ItemType.SelectionContainer:
-                    currencyTrade.Buy = currencyTrade.SelectionContainer.Buy * currencyTrade.SelectionContainerAmount - currencyTrade.CoinCost;
-                    currencyTrade.Sell = currencyTrade.SelectionContainer.Sell * currencyTrade.SelectionContainerAmount - currencyTrade.CoinCost;
+                    currencyTrade.Buy = currencyTrade.SelectionContainer.Buy * currencyTrade.Amount - currencyTrade.CoinCost;
+                    currencyTrade.Sell = currencyTrade.SelectionContainer.Sell * currencyTrade.Amount - currencyTrade.CoinCost;
                     break;
                 case ItemType.Container:
                     break;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using fast_api.Contracts.DTO;
 using fast_api.Services.interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -10,24 +9,24 @@ namespace fast_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ItemsController : ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly IItemsService _itemsService;
-        private readonly ILogger<ItemsController> _logger;
+        private readonly ICategoryService _categoryService;
+        private readonly ILogger<SelectionContainerController> _logger;
 
-        public ItemsController(IItemsService itemsService, ILogger<ItemsController> logger)
+        public CategoryController(ICategoryService categoryService, ILogger<SelectionContainerController> logger)
         {
-            _itemsService = itemsService;
+            _categoryService = categoryService;
             _logger = logger;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ItemDTO), 200)]
+        [ProducesResponseType(typeof(CategoryDTO), 200)]
         public async Task<ActionResult> Get()
         {
             try
             {
-                return Ok(await _itemsService.GetAsync());
+                return Ok(await _categoryService.GetAsync());
             }
             catch (Exception e)
             {
@@ -36,13 +35,12 @@ namespace fast_api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("fetch")]
-        public async Task<ActionResult> FetchFromApi()
+        [HttpPost]
+        public async Task<ActionResult> Post(CategoryDTO category)
         {
             try
             {
-                await _itemsService.FetchItemsFromApiAsync();
+                await _categoryService.AddOrUpdateAsync(category);
                 return Ok();
             }
             catch (Exception e)
@@ -52,13 +50,13 @@ namespace fast_api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("UpdatePricesAsync")]
-        public async Task<ActionResult> UpdatePrices()
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
             try
             {
-                await _itemsService.UpdatePricesAsync();
+                await _categoryService.DeleteAsync(id);
                 return Ok();
             }
             catch (Exception e)

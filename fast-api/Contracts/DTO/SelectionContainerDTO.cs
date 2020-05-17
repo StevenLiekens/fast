@@ -10,20 +10,17 @@ namespace fast_api.Contracts.DTO
 {
     public class SelectionContainerDTO
     {
-        public int Id { get; set; }
+        public int SelectionContainerId { get; set; }
         public string Name { get; set; }
         public SelectionContainerItemDTO[] Items { get; set; }
-        public PriceDataDTO Price { get; set; }
+        public int Buy { get; set; }
+        public int Sell { get; set; }
     }
 
     public class SelectionContainerItemDTO
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ItemType Type { get; set; }
-
-        public int Id { get; set; }
-        public string Currency { get; set; }
-
+        public int ItemId { get; set; }
+        
         public bool Guaranteed { get; set; }
         public int Amount { get; set; }
     }

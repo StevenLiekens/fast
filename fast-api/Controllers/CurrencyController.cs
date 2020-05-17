@@ -13,12 +13,10 @@ namespace fast_api.Controllers
     public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyService _currencyService;
-        private readonly IMapper _mapper;
         private readonly ILogger<CurrencyController> _logger;
 
-        public CurrencyController(ICurrencyService currencyService, IMapper mapper, ILogger<CurrencyController> logger)
+        public CurrencyController(ICurrencyService currencyService, ILogger<CurrencyController> logger)
         {
-            _mapper = mapper;
             _currencyService = currencyService;
             _logger = logger;
         }
@@ -74,6 +72,7 @@ namespace fast_api.Controllers
         {
             try
             {
+                await _currencyService.DeleteAsync(id);
                 return Ok();
             }
             catch (Exception e)

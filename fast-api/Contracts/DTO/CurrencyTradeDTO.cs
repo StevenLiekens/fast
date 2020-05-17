@@ -16,10 +16,11 @@ namespace fast_api.Contracts.DTO
         public string Type { get; set; }
 
         public int ItemId { get; set; }
-        public int ItemAmount { get; set; }
-
         public int SelectionContainerId { get; set; }
-        public int SelectionContainerAmount { get; set; }
+        public int ContainerId { get; set; }
+        public int CategoryId { get; set; }
+        
+        public int Amount { get; set; }
 
         public int Buy { get; set; }
         public int Sell { get; set; }

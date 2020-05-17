@@ -6,6 +6,7 @@ using AutoMapper;
 using fast_api.Contracts.DTO;
 using fast_api.Contracts.Interfaces;
 using fast_api.EntityFramework;
+using fast_api.EntityFramework.Entities;
 using fast_api.Http;
 using fast_api.Services.interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +44,7 @@ namespace fast_api.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdatePrices()
+        public async Task UpdatePricesAsync()
         {
             var items = _context.Items.ToList();
 
@@ -59,7 +60,7 @@ namespace fast_api.Services
             });
 
             await _context.SaveChangesAsync();
-            await _selectionContainerService.UpdatePrices();
+            await _selectionContainerService.UpdatePricesAsync();
         }
     }
 }

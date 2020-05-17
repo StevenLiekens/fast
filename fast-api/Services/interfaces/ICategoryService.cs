@@ -4,12 +4,11 @@ using fast_api.Contracts.DTO;
 
 namespace fast_api.Services.interfaces
 {
-    public interface ICurrencyService
+    public interface ICategoryService
     {
-        Task<PriceDataDTO> GetCurrencyValueAsync(string currency);
-        Task<List<CurrencyTradeDTO>> GetAsync();
+        Task<List<CategoryDTO>> GetAsync();
         Task DeleteAsync(int id);
-        Task AddOrUpdateAsync(CurrencyTradeDTO currencyTradeDto);
+        Task AddOrUpdateAsync(CategoryDTO categoryDto);
         Task UpdatePricesAsync();
     }
 }

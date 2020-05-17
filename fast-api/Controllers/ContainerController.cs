@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using fast_api.Contracts.DTO;
 using fast_api.Services.interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -10,24 +9,24 @@ namespace fast_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ItemsController : ControllerBase
+    public class ContainerController : ControllerBase
     {
-        private readonly IItemsService _itemsService;
-        private readonly ILogger<ItemsController> _logger;
+        private readonly ISelectionContainerService _selectionContainerService;
+        private readonly ILogger<SelectionContainerController> _logger;
 
-        public ItemsController(IItemsService itemsService, ILogger<ItemsController> logger)
+        public ContainerController(ISelectionContainerService selectionContainerService, ILogger<SelectionContainerController> logger)
         {
-            _itemsService = itemsService;
+            _selectionContainerService = selectionContainerService;
             _logger = logger;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ItemDTO), 200)]
+        [ProducesResponseType(typeof(SelectionContainerDTO), 200)]
         public async Task<ActionResult> Get()
         {
             try
             {
-                return Ok(await _itemsService.GetAsync());
+                return Ok(await _selectionContainerService.GetAsync());
             }
             catch (Exception e)
             {
@@ -36,13 +35,12 @@ namespace fast_api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("fetch")]
-        public async Task<ActionResult> FetchFromApi()
+        [HttpPost]
+        public async Task<ActionResult> Post(SelectionContainerDTO selectionContainer)
         {
             try
             {
-                await _itemsService.FetchItemsFromApiAsync();
+                await _selectionContainerService.AddOrUpdateAsync(selectionContainer);
                 return Ok();
             }
             catch (Exception e)
@@ -52,13 +50,13 @@ namespace fast_api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("UpdatePricesAsync")]
-        public async Task<ActionResult> UpdatePrices()
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
             try
             {
-                await _itemsService.UpdatePricesAsync();
+                await _selectionContainerService.DeleteAsync(id);
                 return Ok();
             }
             catch (Exception e)
