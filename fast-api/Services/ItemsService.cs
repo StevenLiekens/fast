@@ -67,11 +67,6 @@ namespace fast_api.Services
 
             //TODO: Unfuck this. needs more thinking. Build hierarchy? Iterate until all updated?
             await _context.SaveChangesAsync();
-            await _categoryService.UpdatePricesAsync();
-
-            await _currencyService.UpdatePricesAsync();
-            await _selectionContainerService.UpdatePricesAsync();
-            await _containerService.UpdatePricesAsync();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using fast_api.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace fast_api.EntityFramework.Entities
@@ -60,14 +61,5 @@ namespace fast_api.EntityFramework.Entities
 
         public CurrencyTrade CurrencyTrade { get; set; }
         public int CurrencyTradeId { get; set; }
-    }
-    
-    public enum ItemType
-    {
-        Item,
-        SelectionContainer,
-        Container,
-        Category,
-        Currency
     }
 }

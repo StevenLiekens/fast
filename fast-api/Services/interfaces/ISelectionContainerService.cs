@@ -9,6 +9,6 @@ namespace fast_api.Services.interfaces
         Task<List<SelectionContainer>> GetAsync();
         Task DeleteAsync(int id);
         Task AddOrUpdateAsync(SelectionContainer selectionContainer);
-        Task UpdatePricesAsync();
+        Task UpdatePriceAsync(SelectionContainer selectionContainer);
     }
 }
