@@ -12,21 +12,21 @@ namespace fast_api.Helpers
     {
         public EntityWrapper(Container container)
         {
-            Id = container.ContainerId;
+            Id = GetWrapperId(ItemType, container.ContainerId);
             ItemType = ItemType.Container;
             Container = container;
         }
 
         public EntityWrapper(CurrencyTrade currencyTrade)
         {
-            Id = currencyTrade.CurrencyTradeId;
+            Id = GetWrapperId(ItemType, currencyTrade.CurrencyTradeId);
             ItemType = ItemType.Currency;
             CurrencyTrade = currencyTrade;
         }
 
         public EntityWrapper(SelectionContainer selectionContainer)
         {
-            Id = selectionContainer.SelectionContainerId;
+            Id = GetWrapperId(ItemType, selectionContainer.SelectionContainerId);
             ItemType = ItemType.SelectionContainer;
             SelectionContainer = selectionContainer;
         }
@@ -47,27 +47,27 @@ namespace fast_api.Helpers
                 case ItemType.SelectionContainer:
                     dependencies.AddRange(SelectionContainer.SelectionContainerCurrencies.SelectMany(x =>
                         currencyTradeIdsByCurrency[x.Currency]
-                            .Select(id => entities.FirstOrDefault(entity => entity.Id == id))));
+                            .Select(id => entities.FirstOrDefault(entity => entity.Id == GetWrapperId(ItemType.Currency, id)))));
                     dependencies.AddRange(SelectionContainer.SelectionContainerContainers.Select(x =>
-                        entities.FirstOrDefault(entity => entity.Id == x.ContainerId)));
+                        entities.FirstOrDefault(entity => entity.Id == GetWrapperId(ItemType.Container, x.ContainerId))));
                     break;
                 case ItemType.Container:
                     dependencies.AddRange(Container.ContainerCurrencies.SelectMany(x =>
                         currencyTradeIdsByCurrency[x.Currency]
-                            .Select(id => entities.FirstOrDefault(entity => entity.Id == id))));
+                            .Select(id => entities.FirstOrDefault(entity => entity.Id == GetWrapperId(ItemType.Currency, id)))));
                     dependencies.AddRange(Container.ContainerContainers.Select(x =>
-                        entities.FirstOrDefault(entity => entity.Id == x.ContainerId)));
+                        entities.FirstOrDefault(entity => entity.Id == GetWrapperId(ItemType.Container, x.ContainerId))));
                     dependencies.AddRange(Container.ContainerSelectionContainers.Select(x =>
-                        entities.FirstOrDefault(entity => entity.Id == x.ContainerId)));
+                        entities.FirstOrDefault(entity => entity.Id == GetWrapperId(ItemType.SelectionContainer, x.SelectionContainerId))));
                     break;
                 case ItemType.Currency:
                     switch (CurrencyTrade.ItemType)
                     {
                         case ItemType.SelectionContainer:
-                            dependencies.Add(entities.FirstOrDefault(x => x.Id == CurrencyTrade.SelectionContainerId));
+                            dependencies.Add(entities.FirstOrDefault(x => x.Id == GetWrapperId(ItemType.SelectionContainer, CurrencyTrade.SelectionContainerId.Value)));
                             break;
                         case ItemType.Container:
-                            dependencies.Add(entities.FirstOrDefault(x => x.Id == CurrencyTrade.ContainerId));
+                            dependencies.Add(entities.FirstOrDefault(x => x.Id == GetWrapperId(ItemType.Container, CurrencyTrade.ContainerId.Value)));
                             break;
                     }
 
@@ -78,5 +78,7 @@ namespace fast_api.Helpers
 
             Dependencies = dependencies.ToArray();
         }
+
+        public static int GetWrapperId(ItemType itemType, int id) => int.Parse($"{itemType}{id}");
     }
 }
