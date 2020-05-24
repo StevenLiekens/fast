@@ -2,10 +2,10 @@
 {
     public enum ItemType
     {
-        Item,
-        SelectionContainer,
-        Container,
-        Category,
-        Currency
+        Item = 1,
+        SelectionContainer = 2,
+        Container = 3,
+        Category = 4,
+        Currency = 5
     }
 }
