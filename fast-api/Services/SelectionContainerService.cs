@@ -45,15 +45,9 @@ namespace fast_api.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdatePricesAsync()
+        public async Task UpdatePriceAsync(SelectionContainer selectionContainer)
         {
-            var selectionContainers = await _context.SelectionContainers
-                .Include(selectionContainer => selectionContainer.SelectionContainerItems)
-                .Include(selectionContainer => selectionContainer.SelectionContainerCategories)
-                .Include(selectionContainer => selectionContainer.SelectionContainerCurrencies)
-                .Include(selectionContainer => selectionContainer.SelectionContainerContainers)
-                .ToListAsync();
-            selectionContainers.ForEach(CalculateSelectionContainerPrice);
+            CalculateSelectionContainerPrice(selectionContainer);
             await _context.SaveChangesAsync();
         }
 

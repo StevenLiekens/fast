@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using fast_api.EntityFramework;
 using fast_api.EntityFramework.Entities;
+using fast_api.Enums;
 using fast_api.Services.interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,6 +60,12 @@ namespace fast_api.Services
         {
             var currencyTrades = await _context.CurrencyTrades.Include(currencyTrade => currencyTrade.CurrencyTradeCost).ToListAsync();
             currencyTrades.ForEach(CalculateCurrencyTradePrices);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdatePriceAsync(CurrencyTrade currencyTrade)
+        {
+            CalculateCurrencyTradePrices(currencyTrade);
             await _context.SaveChangesAsync();
         }
 

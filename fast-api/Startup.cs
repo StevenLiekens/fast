@@ -56,6 +56,9 @@ namespace fast_api
             services.AddScoped<IItemsService, ItemsService>();
             services.AddScoped<ISelectionContainerService, SelectionContainerService>();
             services.AddScoped<ICurrencyService, CurrencyService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IContainerService, ContainerService>();
+            services.AddScoped<IUpdateService, UpdateService>();
             services.AddTransient<ITpItemService, TpItemService>();
             services.AddTransient<IGw2ApiRepository, Gw2ApiRepository>();
             services.AddSingleton<ICacheRepository, Gw2ItemRedisRepository>();

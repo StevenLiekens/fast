@@ -10,6 +10,6 @@ namespace fast_api.Services.interfaces
         Task<List<CurrencyTrade>> GetAsync();
         Task DeleteAsync(int id);
         Task AddOrUpdateAsync(CurrencyTrade currencyTrade);
-        Task UpdatePricesAsync();
+        Task UpdatePriceAsync(CurrencyTrade currencyTrade);
     }
 }

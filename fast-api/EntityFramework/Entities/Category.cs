@@ -16,7 +16,7 @@ namespace fast_api.EntityFramework.Entities
         }
     }
     
-    public class Category : IBuy, ISell
+    public class Category
     {
         public int CategoryId { get; set; }
         public string Name { get; set; }
