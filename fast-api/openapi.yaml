@@ -1,0 +1,195 @@
+openapi: 3.0.0
+info:
+  title: Fast Gaming Community API
+  description: API serving data gathered and analyzed by our lord and savior Cornix
+  contact:
+    name: Jason Houtekamer
+    url: https://github.com/JasonHoutekamer
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+  - url: https://test.gaming-community.com/api/v1
+    description: Test Server
+  - url: https://fast.gaming-community.com/api/v1
+    description: Production Server
+tags:
+  - name: Categories
+    description: Everything about item categories
+  - name: Items
+    description: Everything about non-container items
+paths:
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List all categories
+      operationId: Get
+      responses:
+        '200':
+          description: An array of categories
+          content:
+            applicaton/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      tags:
+        - Categories
+      summary: Upsert a category
+      operationId: Post
+      requestBody:
+        description: New or updated category
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '201':
+          description: Category
+          content:
+            applicaton/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  /categories/{id}:
+    delete:
+      summary: Delete a specific category
+      operationId: Delete
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category Id
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+  /categories/{id}/items:
+    get:
+      summary: List all items for category with id
+      operationId: GetItemsForCategory
+      tags:
+        - Categories
+        - Items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category Id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An array of category items
+          content:
+            applicaton/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        buy:
+          type: integer
+          format: int32
+        sell:
+          type: integer
+          format: int32
+    Category:
+      type: object
+      required:
+        - categoryId
+        - name
+        - info
+      properties:
+        categoryId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        info:
+          type: string
+        categoryItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        buy:
+          type: integer
+          format: int32
+        sell:
+          type: integer
+          format: int32
+    Container:
+      type: object
+      required:
+        - containerId
+        - name
+        - info
+        - tag
+      properties:
+        containerId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        info:
+          type: string
+        tag:
+          type: string
+        containerItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerItem'
+        containerContainers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerContainer'
+    ContainerItem:
+      type: object
+      required:
+        - item
+        - droprate
+      properties:
+        item:
+          $ref: '#/components/schemas/Item'
+        droprate:
+          type: number
+          format: double
+    ContainerContainer:
+      type: object
+      required:
+        - container
+        - droprate
+      properties:
+        container:
+          $ref: '#/components/schemas/Container'
+        droprate:
+          type: number
+          format: double
+    ContainerSelectionContainer:
+      type: object
+      required:
+        - selectionContainer
+        - droprate
+      properties:
+        selectionContainer:
+          $ref: '#/components/schemas/Container'
+        droprate:
+          type: number
+          format: double
