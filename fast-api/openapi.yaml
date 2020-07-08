@@ -15,17 +15,24 @@ servers:
   - url: https://fast.gaming-community.com/api/v1
     description: Production Server
 tags:
+  - name: Items
+    description: Everything about items
   - name: Categories
     description: Everything about item categories
-  - name: Items
-    description: Everything about non-container items
+  - name: Containers
+    description: Everything about containers
+  - name: SelectionContainers
+    description: Everything about selectionContainers
+  - name: CurrencyTrades
+    description: Everything about currencyTrades
+    
 paths:
   /categories:
     get:
       tags:
         - Categories
       summary: List all categories
-      operationId: Get
+      operationId: GetAllCategories
       responses:
         '200':
           description: An array of categories
@@ -39,7 +46,7 @@ paths:
       tags:
         - Categories
       summary: Upsert a category
-      operationId: Post
+      operationId: PostCategory
       requestBody:
         description: New or updated category
         required: true
@@ -55,9 +62,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/Category'
   /categories/{id}:
+    get:
+      summary: Gets a category by id
+      operationId: GetCategory
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category Id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The category with the specified id
+          content:
+            applicaton/json:
+              schema:
+                $ref: '#/components/schemas/Item'
     delete:
       summary: Delete a specific category
-      operationId: Delete
+      operationId: DeleteCategory
       tags:
         - Categories
       parameters:
@@ -93,6 +119,37 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Item'
+  /items:
+    get:
+      tags:
+        - Items
+      summary: List all items
+      operationId: GetAllItems
+      responses:
+        '200':
+          description: An array of categories
+          content:
+            applicaton/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /items/{id}:
+    get:
+      summary: Get an item by id
+      operationId: GetItem
+      tags:
+        - Items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category Id
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
 components:
   schemas:
     Item:
