@@ -160,6 +160,88 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContainerContainer'
+        containerSelectionContainers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerSelectionContainer'
+        containerCategory:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerCategory'
+        containerCurrency:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerCurrency'
+        buy:
+          type: integer
+          format: int32
+        sell:
+          type: integer
+          format: int32
+    SelectionContainer:
+      type: object
+      required:
+        - containerId
+        - name
+        - info
+        - tag
+      properties:
+        containerId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        info:
+          type: string
+        tag:
+          type: string
+        containerItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerItem'
+        containerContainers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerContainer'
+        buy:
+          type: integer
+          format: int32
+        sell:
+          type: integer
+          format: int32
+    CurrencyTrade:
+      type: object
+      required:
+        - containerId
+        - name
+        - info
+        - tag
+      properties:
+        containerId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        info:
+          type: string
+        tag:
+          type: string
+        containerItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerItem'
+        containerContainers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerContainer'
+        buy:
+          type: integer
+          format: int32
+        sell:
+          type: integer
+          format: int32
+          
+
     ContainerItem:
       type: object
       required:
@@ -189,7 +271,30 @@ components:
         - droprate
       properties:
         selectionContainer:
-          $ref: '#/components/schemas/Container'
+          $ref: '#/components/schemas/SelectionContainer'
         droprate:
           type: number
           format: double
+    ContainerCategory:
+      type: object
+      required:
+        - category
+        - droprate
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+        droprate:
+          type: number
+          format: double
+    ContainerCurrency:
+      type: object
+      required:
+        - currency
+        - droprate
+      properties:
+        currency:
+          type: string
+        droprate:
+          type: number
+          format: double
+
